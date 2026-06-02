@@ -8,7 +8,7 @@ from PIL import Image
 # 1. ตั้งค่าหน้าตาแอปหลัก
 st.set_page_config(page_title="My AI Buddy", page_icon="🤖", layout="centered")
 st.title("✨ My AI Robot Boys")
-st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชันแก้ทรงลุง 🛡️)")
+st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชันแก้บั๊กโมเดล 🛡️)")
 
 # 2. เริ่มต้นการเชื่อมต่อ
 if "ai_client" not in st.session_state:
@@ -16,9 +16,9 @@ if "ai_client" not in st.session_state:
     GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
     
     st.session_state.ai_client = genai.Client(api_key=GOOGLE_API_KEY)
-    # 🛠️ ปิดระบบค้นหาเน็ตชั่วคราว เพื่อป้องกัน Error ตอนที่น้องอัปโหลดรูปให้ AI ดู
+    # 🛠️ ปรับเปลี่ยนสมองเป็นรุ่นประหยัดโควต้าสูงสุด gemini-2.5-flash-lite
     st.session_state.chat_session = st.session_state.ai_client.chats.create(
-        model="gemini-1.5-flash"
+        model="gemini-2.5-flash-lite"
     )
 
 if "messages" not in st.session_state:
@@ -36,7 +36,7 @@ with st.sidebar:
     if st.button("🗑️ เริ่มแชทใหม่", use_container_width=True):
         st.session_state.messages = []
         st.session_state.chat_session = st.session_state.ai_client.chats.create(
-            model="gemini-1.5-flash"
+            model="gemini-2.5-flash-lite"
         )
         st.rerun()
         
@@ -91,7 +91,7 @@ if user_input := st.chat_input("พิมพ์ข้อความที่น
         
         with st.spinner("กำลังประมวลผล... ✨"):
             try: 
-                # 🛡️ ลองส่งข้อความไปหา Google (ถ้าแครช มันจะเด้งไปทำคำสั่ง except ทันที)
+                # 🛡️ ส่งข้อความไปหา Google (ใช้สมองรุ่นใหม่ผ่านระบบดักจับ Error)
                 response = st.session_state.chat_session.send_message(content_to_send)
                 ai_text = response.text
                 response_placeholder.markdown(ai_text)
@@ -113,6 +113,6 @@ if user_input := st.chat_input("พิมพ์ข้อความที่น
                 })
                 
             except Exception as e:
-                # 🚨 ถ้า Google ขัดข้อง จะขึ้นข้อความนี้แทนจอแดง
+                # 🚨 แสดงผลเมื่อเซิร์ฟเวอร์มีปัญหาแบบอ่านง่าย
                 st.error(f"ระบบขัดข้องชั่วคราวจากเซิร์ฟเวอร์: {e}")
                 st.info("💡 คำแนะนำ: ลองกดปุ่ม '🗑️ เริ่มแชทใหม่' ที่เมนูด้านซ้าย แล้วพิมพ์คุยใหม่อีกครั้งดูนะครับ")
