@@ -7,8 +7,8 @@ from PIL import Image
 
 # 1. ตั้งค่าหน้าตาแอปหลัก
 st.set_page_config(page_title="My AI Buddy", page_icon="🤖", layout="centered")
-st.title("✨ My AI Buddy")
-st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชันแก้บั๊กแดง 🛡️)")
+st.title("✨ My AI Robot Boys")
+st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชันแก้ทรงลุง 🛡️)")
 
 # 2. เริ่มต้นการเชื่อมต่อ
 if "ai_client" not in st.session_state:
@@ -18,7 +18,7 @@ if "ai_client" not in st.session_state:
     st.session_state.ai_client = genai.Client(api_key=GOOGLE_API_KEY)
     # 🛠️ ปิดระบบค้นหาเน็ตชั่วคราว เพื่อป้องกัน Error ตอนที่น้องอัปโหลดรูปให้ AI ดู
     st.session_state.chat_session = st.session_state.ai_client.chats.create(
-        model="gemini-2.5-flash"
+        model="gemini-1.5-flash"
     )
 
 if "messages" not in st.session_state:
@@ -36,7 +36,7 @@ with st.sidebar:
     if st.button("🗑️ เริ่มแชทใหม่", use_container_width=True):
         st.session_state.messages = []
         st.session_state.chat_session = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash"
+            model="gemini-1.5-flash"
         )
         st.rerun()
         
@@ -56,7 +56,7 @@ with st.sidebar:
 
 # --- กล่องข้อความต้อนรับ ---
 if len(st.session_state.messages) == 0:
-    st.info("👋 สวัสดีครับ! ผมคือ AI Buddy ของคุณ ลองพิมพ์ทักทาย, ถามข้อมูล หรือส่งรูปมาให้ผมดูที่แถบด้านซ้ายได้เลยครับ")
+    st.info("👋 สวัสดีครับ! ผมคือ AI RobotBoys ของสกาย ลองพิมพ์ทักทาย, ถามข้อมูล หรือส่งรูปมาให้ผมดูที่แถบด้านซ้ายได้เลยครับ")
 
 # 4. แสดงข้อความเก่าๆ 
 for msg in st.session_state.messages:
