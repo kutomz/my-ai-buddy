@@ -20,10 +20,10 @@ if "ai_client" not in st.session_state:
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {"แชทห้องที่ 1": []} # เก็บข้อความของแต่ละห้อง
 if "chat_instances" not in st.session_state:
-    # เก็บสมอง AI ของแต่ละห้อง เพื่อให้มันจำบริบทของห้องนั้นๆ ได้
+    # 🛠️ ใช้สมองรุ่น 2.5 ที่ฉลาดที่สุดและต่อเน็ตค้นหาข้อมูลได้
     st.session_state.chat_instances = {
         "แชทห้องที่ 1": st.session_state.ai_client.chats.create(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             config=types.GenerateContentConfig(tools=[{"google_search": {}}])
         )
     }
@@ -50,8 +50,9 @@ with st.sidebar:
     if st.button("➕ สร้างห้องแชทใหม่", use_container_width=True):
         new_room_name = f"แชทห้องที่ {len(st.session_state.chat_sessions) + 1}"
         st.session_state.chat_sessions[new_room_name] = []
+        # 🛠️ ใช้สมองรุ่น 2.5 สำหรับห้องแชทใหม่
         st.session_state.chat_instances[new_room_name] = st.session_state.ai_client.chats.create(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             config=types.GenerateContentConfig(tools=[{"google_search": {}}])
         )
         st.session_state.current_topic = new_room_name
