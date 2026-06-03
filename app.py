@@ -12,24 +12,20 @@ st.set_page_config(page_title="My AI Robot Boys", page_icon="✨", layout="wide"
 # --- 🎨 เริ่มต้นเวทมนตร์ CSS ตกแต่งหน้าตา (สไตล์คลีนๆ แบบ Gemini) ---
 st.markdown("""
 <style>
-    /* ซ่อนแค่เมนูตั้งค่าขวาบนและข้อความล่างสุด แต่เก็บแถบเปิดเมนูซ้ายมือไว้ */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* ระยะห่างของหน้าจอโดยรวม ให้ดูไม่อึดอัด */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
 
-    /* ปรับกล่องข้อความแชทให้ไม่มีพื้นหลัง (โปร่งใส) คล้าย Gemini */
     .stChatMessage {
         background-color: transparent !important;
         border: none !important;
         padding: 1.5rem 0 !important;
     }
     
-    /* ปรับขนาดตัวอักษรให้พอดี อ่านง่าย */
     .stMarkdown p {
         font-size: 16px;
         line-height: 1.6;
@@ -39,7 +35,7 @@ st.markdown("""
 # --- จบเวทมนตร์ CSS ---
 
 st.title("✨ My AI Robot Boys")
-st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชัน 4.1: คืนชีพปุ่มเมนูมือถือ 📱)")
+st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชัน 5.0: ส่งรูปได้ทีละหลายๆ รูปแล้ว 📸)")
 
 # 2. เริ่มต้นการเชื่อมต่อ
 if "ai_client" not in st.session_state:
@@ -83,7 +79,6 @@ with st.sidebar:
         st.session_state.current_topic = new_room_name
         st.rerun()
 
-    # แสดงปุ่มห้องแชททั้งหมด
     for topic in list(st.session_state.chat_sessions.keys()):
         btn_label = f"💬 {topic}" if topic == st.session_state.current_topic else f"  {topic}"
         if st.button(btn_label, use_container_width=True):
@@ -92,28 +87,33 @@ with st.sidebar:
             
     st.markdown("---")
     st.header("📸 แนบรูปภาพให้ AI")
-    uploaded_file = st.file_uploader(
-        "รองรับ JPG, JPEG, PNG", 
+    
+    # 🛠️ จุดที่แก้: เปิดโหมดรับหลายไฟล์ (accept_multiple_files=True)
+    uploaded_files = st.file_uploader(
+        "อัปโหลดได้หลายรูปพร้อมกัน", 
         type=["jpg", "jpeg", "png"], 
         key=f"uploader_{st.session_state.uploader_key}",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
+        accept_multiple_files=True 
     )
 
-# ดึงข้อมูลของห้องแชทปัจจุบันมาใช้งาน
 current_topic = st.session_state.current_topic
 current_messages = st.session_state.chat_sessions[current_topic]
 current_instance = st.session_state.chat_instances[current_topic]
 
-# --- กล่องข้อความต้อนรับ ---
 if len(current_messages) == 0:
-    st.info(f"✨ ยินดีต้อนรับสู่ **{current_topic}**! ผมพร้อมตอบคำถาม ค้นหาข้อมูลจากเน็ต หรือวิเคราะห์รูปภาพแล้วครับ")
+    st.info(f"✨ ยินดีต้อนรับสู่ **{current_topic}**! ส่งรูปมาหลายๆ รูปพร้อมกันได้เลยนะครับ")
 
-# 4. แสดงข้อความเก่าๆ ในห้องนี้
+# 4. แสดงข้อความเก่าๆ 
 for msg in current_messages:
     avatar_icon = "👤" if msg["role"] == "user" else "✨"
     with st.chat_message(msg["role"], avatar=avatar_icon):
-        if "image" in msg:
+        # 🛠️ จุดที่แก้: ให้รองรับการแสดงรูปภาพแบบหลายรูป (images) และแบบเก่ารูปเดียว (image)
+        if "images" in msg:
+            st.image(msg["images"], width=250)
+        elif "image" in msg:
             st.image(msg["image"], width=250)
+            
         st.markdown(msg["content"])
         if "audio" in msg and msg["audio"] is not None:
             st.audio(msg["audio"], format="audio/mp3")
@@ -121,20 +121,20 @@ for msg in current_messages:
 # 5. ช่องสำหรับพิมพ์ข้อความ
 if user_input := st.chat_input("ป้อนข้อความที่นี่..."):
     
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        current_messages.append({"role": "user", "content": user_input, "image": img})
-        content_to_send = [img, user_input]
+    # 🛠️ จุดที่แก้: เตรียมข้อมูลรูปภาพทั้งหมดเพื่อส่งให้ AI
+    if uploaded_files:
+        imgs = [Image.open(f) for f in uploaded_files]
+        current_messages.append({"role": "user", "content": user_input, "images": imgs})
+        content_to_send = imgs + [user_input]
     else:
         current_messages.append({"role": "user", "content": user_input})
         content_to_send = [user_input]
 
     with st.chat_message("user", avatar="👤"):
-        if uploaded_file is not None:
-            st.image(img, width=250)
+        if uploaded_files:
+            st.image(imgs, width=250)
         st.markdown(user_input)
     
-    # ฝั่ง AI ประมวลผล
     with st.chat_message("assistant", avatar="✨"):
         response_placeholder = st.empty()
         sound_placeholder = st.empty()
@@ -145,7 +145,6 @@ if user_input := st.chat_input("ป้อนข้อความที่นี
                 ai_text = response.text
                 response_placeholder.markdown(ai_text)
                 
-                # --- ลบสัญลักษณ์พิเศษก่อนส่งให้ระบบเสียงอ่าน ---
                 clean_text_for_speech = re.sub(r'[*#`]', '', ai_text)
                 
                 sound_bytes = None
@@ -168,6 +167,7 @@ if user_input := st.chat_input("ป้อนข้อความที่นี
                 st.error(f"ระบบขัดข้อง: {e}")
                 st.info("💡 ลองรีเฟรชหน้าเว็บ หรือสร้างห้องแชทใหม่ดูนะครับ")
 
-    if uploaded_file is not None:
+    # 🛠️ จุดที่แก้: ถ้ามีการอัปโหลดไฟล์ ให้เคลียร์กล่องอัปโหลด
+    if uploaded_files:
         st.session_state.uploader_key += 1
         st.rerun()
