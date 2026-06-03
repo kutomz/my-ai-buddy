@@ -12,10 +12,9 @@ st.set_page_config(page_title="My AI Robot Boys", page_icon="✨", layout="wide"
 # --- 🎨 เริ่มต้นเวทมนตร์ CSS ตกแต่งหน้าตา (สไตล์คลีนๆ แบบ Gemini) ---
 st.markdown("""
 <style>
-    /* ซ่อนเมนูขวาบนและข้อความ Streamlit ด้านล่าง */
+    /* ซ่อนแค่เมนูตั้งค่าขวาบนและข้อความล่างสุด แต่เก็บแถบเปิดเมนูซ้ายมือไว้ */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
     /* ระยะห่างของหน้าจอโดยรวม ให้ดูไม่อึดอัด */
     .block-container {
@@ -40,7 +39,7 @@ st.markdown("""
 # --- จบเวทมนตร์ CSS ---
 
 st.title("✨ My AI Robot Boys")
-st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชัน 4.0: ดีไซน์คลีนสไตล์ Gemini 🌌)")
+st.caption("ผู้ช่วยส่วนตัวสุดฉลาดของคุณ (เวอร์ชัน 4.1: คืนชีพปุ่มเมนูมือถือ 📱)")
 
 # 2. เริ่มต้นการเชื่อมต่อ
 if "ai_client" not in st.session_state:
@@ -97,7 +96,7 @@ with st.sidebar:
         "รองรับ JPG, JPEG, PNG", 
         type=["jpg", "jpeg", "png"], 
         key=f"uploader_{st.session_state.uploader_key}",
-        label_visibility="collapsed" # ซ่อนตัวหนังสือให้ดูคลีนขึ้น
+        label_visibility="collapsed"
     )
 
 # ดึงข้อมูลของห้องแชทปัจจุบันมาใช้งาน
@@ -111,11 +110,10 @@ if len(current_messages) == 0:
 
 # 4. แสดงข้อความเก่าๆ ในห้องนี้
 for msg in current_messages:
-    # เปลี่ยนอวตารให้คล้าย Gemini
     avatar_icon = "👤" if msg["role"] == "user" else "✨"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         if "image" in msg:
-            st.image(msg["image"], width=250) # ปรับขนาดรูปให้เล็กลงนิดนึงจะได้ดูสมูท
+            st.image(msg["image"], width=250)
         st.markdown(msg["content"])
         if "audio" in msg and msg["audio"] is not None:
             st.audio(msg["audio"], format="audio/mp3")
