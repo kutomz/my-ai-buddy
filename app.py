@@ -43,18 +43,24 @@ st.markdown("""
         color: white !important;
     }
     
+    /* 🛠️ แก้ปัญหาตัวหนังสือบนปุ่มล่องหนเวลาเปิด Dark Mode */
     .stButton>button {
-        border-radius: 20px;
-        border: 2px solid #E23636;
-        background-color: white;
-        color: #2F3C7E;
-        font-weight: bold;
+        border-radius: 20px !important;
+        border: 2px solid #E23636 !important;
+        background-color: white !important;
         transition: 0.3s;
+    }
+    /* บังคับตัวหนังสือในปุ่มให้เป็นสีน้ำเงินเข้มเสมอ */
+    .stButton>button p, .stButton>button span, .stButton>button div {
+        color: #2F3C7E !important;
+        font-weight: bold !important;
     }
     .stButton>button:hover {
         background-color: #E23636 !important;
-        color: white !important;
         transform: scale(1.05);
+    }
+    .stButton>button:hover p, .stButton>button:hover span, .stButton>button:hover div {
+        color: white !important;
     }
 
     /* 🛠️ แก้ปัญหาตัวหนังสือล่องหน บังคับให้ข้อความในแชทเป็นสีดำ! */
