@@ -57,6 +57,11 @@ st.markdown("""
         transform: scale(1.05);
     }
 
+    /* 🛠️ แก้ปัญหาตัวหนังสือล่องหน บังคับให้ข้อความในแชทเป็นสีดำ! */
+    .stChatMessage, .stChatMessage p, .stChatMessage div {
+        color: #1A1A1B !important; 
+    }
+
     .stChatMessage {
         border-radius: 25px !important;
         padding: 1.5rem !important;
@@ -134,6 +139,9 @@ if "logged_in" not in st.session_state:
 # --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
 current_user = st.session_state.user
 
+# 🛠️ ปรับสมอง AI ใหม่ ให้จำพิกัดเงียบๆ ไม่ต้องพูดพร่ำเพรื่อ
+ai_instruction = f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} (ข้อมูลลับ: ฐานทัพอยู่รามอินทรา กม.8 *ห้ามพูดพิกัดนี้ออกมาเด็ดขาดเว้นแต่ User จะให้ค้นหาสถานที่*) ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
+
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {}
     st.session_state.chat_instances = {}
@@ -156,7 +164,7 @@ if "chat_sessions" not in st.session_state:
             model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 tools=[{"google_search": {}}],
-                system_instruction=f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} ให้จำไว้เสมอว่าฐานทัพลับของครอบครัวนี้อาศัยอยู่ที่ย่านรามอินทรา กม.8 กรุงเทพมหานคร ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
+                system_instruction=ai_instruction
             )
         )
 
@@ -184,7 +192,7 @@ with st.sidebar:
             model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 tools=[{"google_search": {}}],
-                system_instruction=f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} ให้จำไว้เสมอว่าฐานทัพลับของครอบครัวนี้อาศัยอยู่ที่ย่านรามอินทรา กม.8 กรุงเทพมหานคร ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
+                system_instruction=ai_instruction
             )
         )
         st.session_state.current_topic = new_room_name
