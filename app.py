@@ -217,7 +217,9 @@ current_messages = st.session_state.chat_sessions[current_topic]
 current_instance = st.session_state.chat_instances[current_topic]
 
 st.title("🕸️ My AI Robot Boys 🕷️")
-st.caption(f"📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)")
+
+# 🛠️ เปลี่ยนจาก st.caption เป็น st.markdown เพื่อให้เห็นชัดๆ ไม่โดน Dark Mode กลืน
+st.markdown(f"<p style='color: #2F3C7E; font-size: 16px; font-weight: 500;'>📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)</p>", unsafe_allow_html=True)
 
 if len(current_messages) == 0:
     st.info(f"✨ ยินดีต้อนรับฮีโร่ {current_user}! ระบบพร้อมทำงาน ปล่อยใยพิมพ์ข้อความมาได้เลยครับ")
