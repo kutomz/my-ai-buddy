@@ -132,39 +132,4 @@ if "logged_in" not in st.session_state:
                 if username.lower() == "sky" and password == "1234":
                     st.session_state.logged_in = True
                     st.session_state.user = "sky"
-                    st.query_params["user"] = "sky"
-                    st.rerun()
-                elif username.lower() == "daddy" and password == "5678":
-                    st.session_state.logged_in = True
-                    st.session_state.user = "daddy"
-                    st.query_params["user"] = "daddy"
-                    st.rerun()
-                else:
-                    st.error("❌ ชื่อฮีโร่หรือรหัสผ่านไม่ถูกต้อง ลองใหม่นะ!")
-        st.stop()
-
-# --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
-current_user = st.session_state.user
-
-# ดึงข้อมูลจากฐานข้อมูล Google Sheet มาตั้งต้นระบบจำห้องแชท
-if "chat_sessions" not in st.session_state:
-    st.session_state.chat_sessions = {}
-    st.session_state.chat_instances = {}
-    
-    db_data = load_chat_from_sheet()
-    
-    for row in db_data:
-        if len(row) >= 4:
-            db_user, db_room, db_role, db_msg = row[0], row[1], row[2], row[3]
-            if db_user == current_user:
-                if db_room not in st.session_state.chat_sessions:
-                    st.session_state.chat_sessions[db_room] = []
-                st.session_state.chat_sessions[db_room].append({"role": db_role, "content": db_msg})
-
-    if not st.session_state.chat_sessions:
-        st.session_state.chat_sessions = {"ภารกิจที่ 1": []}
-
-    for room in st.session_state.chat_sessions.keys():
-        st.session_state.chat_instances[room] = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash",
-            config=types.GenerateContentConfig(
+                    st.query_params["user
