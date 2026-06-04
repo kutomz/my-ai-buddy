@@ -20,9 +20,9 @@ st.markdown("""
         font-family: 'Mitr', sans-serif;
     }
 
+    /* ซ่อนแค่เมนู Streamlit ปกติ แต่เปิด header ไว้ให้กดปุ่มเมนูด้านข้างบนมือถือได้ */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
 
     h1, h2, h3 {
         font-family: 'Bangers', cursive !important;
