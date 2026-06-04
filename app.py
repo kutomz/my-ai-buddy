@@ -48,26 +48,33 @@ def save_chat_to_sheet(user, room, role, message):
     except Exception:
         pass
 
-# --- 🔐 ระบบล็อกอินอย่างง่าย ---
+# --- 🔐 ระบบล็อกอินอย่างง่าย (อัปเกรดกัน F5 แล้วหลุด) ---
+# แอบเช็คว่าบน URL มีการจำชื่อผู้ใช้ไว้ไหม
 if "logged_in" not in st.session_state:
-    st.markdown("<h2 style='text-align: center;'>🤖 เข้าสู่ระบบ My AI Robot Boys</h2>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        username = st.text_input("ชื่อผู้ใช้งาน (Username)")
-        password = st.text_input("รหัสผ่าน (Password)", type="password")
-        if st.button("เข้าสู่ระบบ 🚀", use_container_width=True):
-            # ตั้งค่าบัญชีใช้งานง่ายๆ ในครอบครัว
-            if username.lower() == "sky" and password == "1234":
-                st.session_state.logged_in = True
-                st.session_state.user = "sky"
-                st.rerun()
-            elif username.lower() == "daddy" and password == "5678":
-                st.session_state.logged_in = True
-                st.session_state.user = "daddy"
-                st.rerun()
-            else:
-                st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
-    st.stop()
+    if st.query_params.get("user") in ["sky", "daddy"]:
+        st.session_state.logged_in = True
+        st.session_state.user = st.query_params.get("user")
+    else:
+        st.markdown("<h2 style='text-align: center;'>🤖 เข้าสู่ระบบ My AI Robot Boys</h2>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("ชื่อผู้ใช้งาน (Username)")
+            password = st.text_input("รหัสผ่าน (Password)", type="password")
+            if st.button("เข้าสู่ระบบ 🚀", use_container_width=True):
+                # ตั้งค่าบัญชีใช้งานง่ายๆ ในครอบครัว
+                if username.lower() == "sky" and password == "1234":
+                    st.session_state.logged_in = True
+                    st.session_state.user = "sky"
+                    st.query_params["user"] = "sky" # <-- 🛠️ แปะชื่อไว้บน URL
+                    st.rerun()
+                elif username.lower() == "daddy" and password == "5678":
+                    st.session_state.logged_in = True
+                    st.session_state.user = "daddy"
+                    st.query_params["user"] = "daddy" # <-- 🛠️ แปะชื่อไว้บน URL
+                    st.rerun()
+                else:
+                    st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+        st.stop()
 
 # --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
 current_user = st.session_state.user
