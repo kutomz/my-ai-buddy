@@ -54,3 +54,117 @@ st.markdown("""
         border: 2px solid #E23636;
         background-color: white;
         color: #2F3C7E;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .stButton>button:hover {
+        background-color: #E23636 !important;
+        color: white !important;
+        transform: scale(1.05);
+    }
+
+    /* ตกแต่งกล่องแชท (Chat Bubbles) ให้เหมือนคอมมิค */
+    .stChatMessage {
+        border-radius: 25px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 1rem !important;
+        border: 3px solid #1A1A1B !important; /* ขอบดำหนาๆ สไตล์การ์ตูน */
+        box-shadow: 5px 5px 0px #ccc;
+    }
+
+    /* แชทฝั่ง AI (RobotBoys) */
+    [data-testid="stChatMessageAssistant"] {
+        background-color: #ffffff !important;
+    }
+    
+    /* แชทฝั่ง User (น้องสกาย) */
+    [data-testid="stChatMessageUser"] {
+        background-color: #d1d9ff !important; /* สีฟ้าอ่อน */
+    }
+
+    /* ปรับแต่งช่องกรอกข้อความด้านล่าง */
+    .stChatInput {
+        border: 3px solid #E23636 !important;
+        border-radius: 30px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# 2. เริ่มต้นการเชื่อมต่อ AI
+if "ai_client" not in st.session_state:
+    st.session_state.ai_client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+
+# ฟังก์ชันสำหรับดึงข้อมูลแชททั้งหมดจาก Google Sheet
+def load_chat_from_sheet():
+    try:
+        response = requests.get(st.secrets["SHEET_API_URL"])
+        if response.status_code == 200:
+            return response.json().get("data", [])
+    except Exception:
+        return []
+    return []
+
+# ฟังก์ชันสำหรับบันทึกแชทลง Google Sheet
+def save_chat_to_sheet(user, room, role, message):
+    try:
+        requests.post(st.secrets["SHEET_API_URL"], json={
+            "action": "append",
+            "user": user,
+            "room": room,
+            "role": role,
+            "message": message
+        })
+    except Exception:
+        pass
+
+# --- 🔐 ระบบล็อกอินอย่างง่าย (อัปเกรดกัน F5 แล้วหลุด) ---
+if "logged_in" not in st.session_state:
+    if st.query_params.get("user") in ["sky", "daddy"]:
+        st.session_state.logged_in = True
+        st.session_state.user = st.query_params.get("user")
+    else:
+        st.markdown("<h2 style='text-align: center; color: #E23636; text-shadow: 2px 2px #2F3C7E;'>🕷️ เข้าสู่ฐานทัพลับ My AI Robot Boys 🕸️</h2>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("ชื่อฮีโร่ (Username)")
+            password = st.text_input("รหัสผ่านลับ (Password)", type="password")
+            if st.button("ปล่อยใย เข้าสู่ระบบ! 🚀", use_container_width=True):
+                if username.lower() == "sky" and password == "1234":
+                    st.session_state.logged_in = True
+                    st.session_state.user = "sky"
+                    st.query_params["user"] = "sky"
+                    st.rerun()
+                elif username.lower() == "daddy" and password == "5678":
+                    st.session_state.logged_in = True
+                    st.session_state.user = "daddy"
+                    st.query_params["user"] = "daddy"
+                    st.rerun()
+                else:
+                    st.error("❌ ชื่อฮีโร่หรือรหัสผ่านไม่ถูกต้อง ลองใหม่นะ!")
+        st.stop()
+
+# --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
+current_user = st.session_state.user
+
+# ดึงข้อมูลจากฐานข้อมูล Google Sheet มาตั้งต้นระบบจำห้องแชท
+if "chat_sessions" not in st.session_state:
+    st.session_state.chat_sessions = {}
+    st.session_state.chat_instances = {}
+    
+    db_data = load_chat_from_sheet()
+    
+    for row in db_data:
+        if len(row) >= 4:
+            db_user, db_room, db_role, db_msg = row[0], row[1], row[2], row[3]
+            if db_user == current_user:
+                if db_room not in st.session_state.chat_sessions:
+                    st.session_state.chat_sessions[db_room] = []
+                st.session_state.chat_sessions[db_room].append({"role": db_role, "content": db_msg})
+
+    if not st.session_state.chat_sessions:
+        st.session_state.chat_sessions = {"ภารกิจที่ 1": []}
+
+    for room in st.session_state.chat_sessions.keys():
+        st.session_state.chat_instances[room] = st.session_state.ai_client.chats.create(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
