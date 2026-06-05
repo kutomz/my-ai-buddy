@@ -112,9 +112,9 @@ def save_chat_to_sheet(user, room, role, message):
     except Exception:
         pass
 
-# --- 🔐 ระบบล็อกอินอย่างง่าย ---
+# --- 🔐 ระบบล็อกอินอย่างง่าย (อัปเกรดเพิ่ม ID คุณแม่) ---
 if "logged_in" not in st.session_state:
-    if st.query_params.get("user") in ["sky", "daddy"]:
+    if st.query_params.get("user") in ["sky", "daddy", "mommy"]:
         st.session_state.logged_in = True
         st.session_state.user = st.query_params.get("user")
     else:
@@ -133,6 +133,11 @@ if "logged_in" not in st.session_state:
                     st.session_state.logged_in = True
                     st.session_state.user = "daddy"
                     st.query_params["user"] = "daddy" 
+                    st.rerun()
+                elif username.lower() in ["mom", "mommy"] and password == "9999": # 🆕 เพิ่มระบบสแกนลายนิ้วมือคุณแม่!
+                    st.session_state.logged_in = True
+                    st.session_state.user = "mommy"
+                    st.query_params["user"] = "mommy" 
                     st.rerun()
                 else:
                     st.error("❌ ชื่อฮีโร่หรือรหัสผ่านไม่ถูกต้อง ลองใหม่นะ!")
