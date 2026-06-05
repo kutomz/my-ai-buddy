@@ -63,11 +63,7 @@ st.markdown("""
         color: white !important;
     }
 
-    /* 🛠️ แก้ปัญหาตัวหนังสือล่องหน บังคับให้ข้อความในแชทเป็นสีดำ! */
-    .stChatMessage, .stChatMessage p, .stChatMessage div {
-        color: #1A1A1B !important; 
-    }
-
+    /* 🛠️ ล็อกคอตัวหนังสือในแชทให้เป็น "สีดำเข้ม" เสมอ สู้กับ Dark Mode! */
     .stChatMessage {
         border-radius: 25px !important;
         padding: 1.5rem !important;
@@ -79,9 +75,15 @@ st.markdown("""
     [data-testid="stChatMessageAssistant"] {
         background-color: #ffffff !important;
     }
+    [data-testid="stChatMessageAssistant"] * {
+        color: #1A1A1B !important;
+    }
     
     [data-testid="stChatMessageUser"] {
         background-color: #d1d9ff !important; 
+    }
+    [data-testid="stChatMessageUser"] * {
+        color: #1A1A1B !important;
     }
 
     .stChatInput {
@@ -116,7 +118,7 @@ def save_chat_to_sheet(user, room, role, message):
     except Exception:
         pass
 
-# --- 🔐 ระบบล็อกอินอย่างง่าย (อัปเกรดกัน F5 แล้วหลุด) ---
+# --- 🔐 ระบบล็อกอินอย่างง่าย ---
 if "logged_in" not in st.session_state:
     if st.query_params.get("user") in ["sky", "daddy"]:
         st.session_state.logged_in = True
@@ -145,7 +147,7 @@ if "logged_in" not in st.session_state:
 # --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
 current_user = st.session_state.user
 
-# 🛠️ ปรับสมอง AI ใหม่ ให้จำพิกัดเงียบๆ ไม่ต้องพูดพร่ำเพรื่อ
+# 🛠️ ปรับสมอง AI
 ai_instruction = f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} (ข้อมูลลับ: ฐานทัพอยู่รามอินทรา กม.8 *ห้ามพูดพิกัดนี้ออกมาเด็ดขาดเว้นแต่ User จะให้ค้นหาสถานที่*) ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
 
 if "chat_sessions" not in st.session_state:
@@ -204,11 +206,29 @@ with st.sidebar:
         st.session_state.current_topic = new_room_name
         st.rerun()
 
+    # 🆕 ระบบวนลูปแสดงห้องแชท พร้อมปุ่มถังขยะสำหรับลบ!
     for topic in list(st.session_state.chat_sessions.keys()):
-        btn_label = f"🕸️ {topic}" if topic == st.session_state.current_topic else f"  {topic}"
-        if st.button(btn_label, use_container_width=True):
-            st.session_state.current_topic = topic
-            st.rerun()
+        col1, col2 = st.columns([4, 1]) # แบ่งพื้นที่ให้ปุ่มชื่อห้อง 80% และปุ่มลบ 20%
+        
+        with col1:
+            btn_label = f"🕸️ {topic}" if topic == st.session_state.current_topic else f"  {topic}"
+            if st.button(btn_label, key=f"room_{topic}", use_container_width=True):
+                st.session_state.current_topic = topic
+                st.rerun()
+                
+        with col2:
+            # เงื่อนไข: จะลบได้ก็ต่อเมื่อมีห้องแชทมากกว่า 1 ห้อง (ห้ามลบจนเกลี้ยง)
+            if len(st.session_state.chat_sessions) > 1:
+                if st.button("🗑️", key=f"del_{topic}"):
+                    # ลบข้อมูลห้องทิ้ง
+                    del st.session_state.chat_sessions[topic]
+                    if topic in st.session_state.chat_instances:
+                        del st.session_state.chat_instances[topic]
+                    
+                    # ถ้าเผลอลบห้องที่กำลังเปิดอ่านอยู่ ให้เด้งไปห้องแรกสุดแทน
+                    if st.session_state.current_topic == topic:
+                        st.session_state.current_topic = list(st.session_state.chat_sessions.keys())[0]
+                    st.rerun()
             
     st.markdown("---")
     st.header("📸 วิเคราะห์รูปภาพ")
@@ -224,8 +244,12 @@ current_instance = st.session_state.chat_instances[current_topic]
 
 st.title("🕸️ My AI Robot Boys 🕷️")
 
-# 🛠️ เปลี่ยนจาก st.caption เป็น st.markdown เพื่อให้เห็นชัดๆ ไม่โดน Dark Mode กลืน
-st.markdown(f"<p style='color: #2F3C7E; font-size: 16px; font-weight: 500;'>📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)</p>", unsafe_allow_html=True)
+# 🛠️ ทำกล่องพื้นหลังสีขาวหุ้มป้ายพิกัดไว้เลย จะได้เห็นชัดๆ แม้จะเปิดโหมดมืด
+st.markdown(f"""
+<div style='background-color: white; padding: 10px; border-radius: 10px; border: 2px solid #E23636; margin-bottom: 15px;'>
+    <p style='color: #1A1A1B; font-size: 16px; font-weight: bold; margin: 0;'>📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)</p>
+</div>
+""", unsafe_allow_html=True)
 
 if len(current_messages) == 0:
     st.info(f"✨ ยินดีต้อนรับฮีโร่ {current_user}! ระบบพร้อมทำงาน ปล่อยใยพิมพ์ข้อความมาได้เลยครับ")
