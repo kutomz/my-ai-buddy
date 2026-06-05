@@ -1,5 +1,3 @@
-from gtts import gTTS
-import io
 import re
 import requests
 import streamlit as st
@@ -293,14 +291,30 @@ if user_input := st.chat_input("ป้อนข้อความที่นี
                 
                 clean_text_for_speech = re.sub(r'[*#`]', '', ai_text)
                 sound_bytes = None
+                
+                # 🚀 🚀 🚀 เริ่มต้นการทำงานของ OpenAI TTS (Jarvis Mode) 🚀 🚀 🚀
                 try:
-                    sound_file = io.BytesIO()
-                    tts = gTTS(text=clean_text_for_speech, lang='th')
-                    tts.write_to_fp(sound_file)
-                    sound_bytes = sound_file.getvalue()
-                    sound_placeholder.audio(sound_bytes, format="audio/mp3")
-                except Exception:
+                    response_audio = requests.post(
+                        "https://api.openai.com/v1/audio/speech",
+                        headers={
+                            "Authorization": f"Bearer {st.secrets['OPENAI_API_KEY']}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "model": "tts-1",
+                            "input": clean_text_for_speech,
+                            "voice": "echo" # 🎙️ เสียงทุ้มหล่อสไตล์ Jarvis (เปลี่ยนเป็น 'alloy' หรือ 'nova' ได้ครับ)
+                        }
+                    )
+                    
+                    if response_audio.status_code == 200:
+                        sound_bytes = response_audio.content
+                        sound_placeholder.audio(sound_bytes, format="audio/mp3")
+                    else:
+                        st.warning("⚠️ ไม่สามารถดึงเสียง Jarvis ได้ (เช็ค API Key ของ OpenAI อีกครั้งนะครับ)")
+                except Exception as e:
                     pass
+                # 🚀 🚀 🚀 สิ้นสุดการทำงานของ OpenAI TTS 🚀 🚀 🚀
                     
                 current_messages.append({
                     "role": "assistant", 
