@@ -10,7 +10,7 @@ from PIL import Image
 # 1. ตั้งค่าหน้าตาแอปหลัก
 st.set_page_config(page_title="My AI Robot Boys", page_icon="🕸️", layout="wide")
 
-# --- 🎨 เวทมนตร์ CSS ตกแต่งหน้าตา (Spider-Man Edition 🕸️) ---
+# --- 🎨 เวทมนตร์ CSS ตกแต่งหน้าตา (ปิดตายผี Dark Mode 100%) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Mitr:wght@300;400;500&display=swap');
@@ -20,7 +20,6 @@ st.markdown("""
         font-family: 'Mitr', sans-serif;
     }
 
-    /* ซ่อนแค่เมนู Streamlit ปกติ แต่เปิด header ไว้ให้กดปุ่มเมนูด้านข้างบนมือถือได้ */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
@@ -39,51 +38,54 @@ st.markdown("""
         background-color: #2F3C7E !important; 
         border-right: 5px solid #E23636;
     }
+    
+    /* ล็อกสีตัวหนังสือในเมนูด้านข้างให้เป็นสีขาว (ยกเว้นในปุ่ม) */
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
         color: white !important;
     }
     
-    /* 🛠️ แก้ปัญหาตัวหนังสือบนปุ่มล่องหนเวลาเปิด Dark Mode */
-    .stButton>button {
+    /* 🛠️ ล็อกคอปุ่มกดทุกชนิด ไม่ให้ Dark Mode มายุ่ง! */
+    div.stButton > button {
         border-radius: 20px !important;
         border: 2px solid #E23636 !important;
-        background-color: white !important;
+        background-color: #ffffff !important;
         transition: 0.3s;
     }
-    /* บังคับตัวหนังสือในปุ่มให้เป็นสีน้ำเงินเข้มเสมอ */
-    .stButton>button p, .stButton>button span, .stButton>button div {
+    /* บังคับตัวหนังสือในปุ่มเป็นสีน้ำเงิน */
+    div.stButton > button * {
         color: #2F3C7E !important;
         font-weight: bold !important;
     }
-    .stButton>button:hover {
+    /* ตอนเอาเมาส์ชี้เปลี่ยนเป็นพื้นแดง อักษรขาว */
+    div.stButton > button:hover {
         background-color: #E23636 !important;
-        transform: scale(1.05);
     }
-    .stButton>button:hover p, .stButton>button:hover span, .stButton>button:hover div {
-        color: white !important;
+    div.stButton > button:hover * {
+        color: #ffffff !important;
     }
 
-    /* 🛠️ ล็อกคอตัวหนังสือในแชทให้เป็น "สีดำเข้ม" เสมอ สู้กับ Dark Mode! */
-    .stChatMessage {
+    /* 🛠️ ล็อกคอแชทสู้ Dark Mode! */
+    div[data-testid="stChatMessage"] {
+        background-color: #ffffff !important; /* พื้นขาวเสมอ */
         border-radius: 25px !important;
         padding: 1.5rem !important;
         margin-bottom: 1rem !important;
         border: 3px solid #1A1A1B !important; 
-        box-shadow: 5px 5px 0px #ccc;
-    }
-
-    [data-testid="stChatMessageAssistant"] {
-        background-color: #ffffff !important;
-    }
-    [data-testid="stChatMessageAssistant"] * {
-        color: #1A1A1B !important;
+        box-shadow: 5px 5px 0px #ccc !important;
     }
     
-    [data-testid="stChatMessageUser"] {
+    /* แชทฝั่งผู้ใช้พื้นฟ้าอ่อน */
+    div[data-testid="stChatMessageUser"] {
         background-color: #d1d9ff !important; 
     }
-    [data-testid="stChatMessageUser"] * {
-        color: #1A1A1B !important;
+
+    /* 🔥 ไม้ตาย: บังคับตัวหนังสือ *ทุกชนิด* ในแชทให้เป็นสีดำเข้มเท่านั้น! 🔥 */
+    div[data-testid="stChatMessage"] div,
+    div[data-testid="stChatMessage"] p,
+    div[data-testid="stChatMessage"] span,
+    div[data-testid="stChatMessage"] a,
+    div[data-testid="stChatMessage"] li {
+        color: #000000 !important; 
     }
 
     .stChatInput {
@@ -144,179 +146,8 @@ if "logged_in" not in st.session_state:
                     st.error("❌ ชื่อฮีโร่หรือรหัสผ่านไม่ถูกต้อง ลองใหม่นะ!")
         st.stop()
 
-# --- 🏠 เข้าสู่หน้าแอปหลักหลังจากล็อกอินผ่านแล้ว ---
+# --- 🏠 เข้าสู่หน้าแอปหลัก ---
 current_user = st.session_state.user
 
 # 🛠️ ปรับสมอง AI
-ai_instruction = f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} (ข้อมูลลับ: ฐานทัพอยู่รามอินทรา กม.8 *ห้ามพูดพิกัดนี้ออกมาเด็ดขาดเว้นแต่ User จะให้ค้นหาสถานที่*) ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
-
-if "chat_sessions" not in st.session_state:
-    st.session_state.chat_sessions = {}
-    st.session_state.chat_instances = {}
-    
-    db_data = load_chat_from_sheet()
-    
-    for row in db_data:
-        if len(row) >= 4:
-            db_user, db_room, db_role, db_msg = row[0], row[1], row[2], row[3]
-            if db_user == current_user:
-                if db_room not in st.session_state.chat_sessions:
-                    st.session_state.chat_sessions[db_room] = []
-                st.session_state.chat_sessions[db_room].append({"role": db_role, "content": db_msg})
-
-    if not st.session_state.chat_sessions:
-        st.session_state.chat_sessions = {"ภารกิจที่ 1": []}
-
-    for room in st.session_state.chat_sessions.keys():
-        st.session_state.chat_instances[room] = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash",
-            config=types.GenerateContentConfig(
-                tools=[{"google_search": {}}],
-                system_instruction=ai_instruction
-            )
-        )
-
-if "current_topic" not in st.session_state:
-    st.session_state.current_topic = list(st.session_state.chat_sessions.keys())[0]
-if "uploader_key" not in st.session_state:
-    st.session_state.uploader_key = 0
-
-# 3. ตกแต่งเมนูด้านข้าง (Sidebar)
-with st.sidebar:
-    st.title(f"🦸‍♂️ ฮีโร่: {current_user.upper()}")
-    if st.button("🚪 ออกจากฐานทัพ", use_container_width=True):
-        del st.session_state.logged_in
-        if "user" in st.session_state:
-            del st.session_state.user
-        st.query_params.clear() 
-        st.rerun()
-        
-    st.markdown("---")
-    st.header("🗂️ ประวัติภารกิจ")
-    if st.button("➕ เริ่มภารกิจใหม่", use_container_width=True):
-        new_room_name = f"ภารกิจที่ {len(st.session_state.chat_sessions) + 1}"
-        st.session_state.chat_sessions[new_room_name] = []
-        st.session_state.chat_instances[new_room_name] = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash",
-            config=types.GenerateContentConfig(
-                tools=[{"google_search": {}}],
-                system_instruction=ai_instruction
-            )
-        )
-        st.session_state.current_topic = new_room_name
-        st.rerun()
-
-    # 🆕 ระบบวนลูปแสดงห้องแชท พร้อมปุ่มถังขยะสำหรับลบ!
-    for topic in list(st.session_state.chat_sessions.keys()):
-        col1, col2 = st.columns([4, 1]) # แบ่งพื้นที่ให้ปุ่มชื่อห้อง 80% และปุ่มลบ 20%
-        
-        with col1:
-            btn_label = f"🕸️ {topic}" if topic == st.session_state.current_topic else f"  {topic}"
-            if st.button(btn_label, key=f"room_{topic}", use_container_width=True):
-                st.session_state.current_topic = topic
-                st.rerun()
-                
-        with col2:
-            # เงื่อนไข: จะลบได้ก็ต่อเมื่อมีห้องแชทมากกว่า 1 ห้อง (ห้ามลบจนเกลี้ยง)
-            if len(st.session_state.chat_sessions) > 1:
-                if st.button("🗑️", key=f"del_{topic}"):
-                    # ลบข้อมูลห้องทิ้ง
-                    del st.session_state.chat_sessions[topic]
-                    if topic in st.session_state.chat_instances:
-                        del st.session_state.chat_instances[topic]
-                    
-                    # ถ้าเผลอลบห้องที่กำลังเปิดอ่านอยู่ ให้เด้งไปห้องแรกสุดแทน
-                    if st.session_state.current_topic == topic:
-                        st.session_state.current_topic = list(st.session_state.chat_sessions.keys())[0]
-                    st.rerun()
-            
-    st.markdown("---")
-    st.header("📸 วิเคราะห์รูปภาพ")
-    uploaded_files = st.file_uploader(
-        "อัปโหลดรูปเบาะแส", type=["jpg", "jpeg", "png"], 
-        key=f"uploader_{st.session_state.uploader_key}",
-        label_visibility="collapsed", accept_multiple_files=True 
-    )
-
-current_topic = st.session_state.current_topic
-current_messages = st.session_state.chat_sessions[current_topic]
-current_instance = st.session_state.chat_instances[current_topic]
-
-st.title("🕸️ My AI Robot Boys 🕷️")
-
-# 🛠️ ทำกล่องพื้นหลังสีขาวหุ้มป้ายพิกัดไว้เลย จะได้เห็นชัดๆ แม้จะเปิดโหมดมืด
-st.markdown(f"""
-<div style='background-color: white; padding: 10px; border-radius: 10px; border: 2px solid #E23636; margin-bottom: 15px;'>
-    <p style='color: #1A1A1B; font-size: 16px; font-weight: bold; margin: 0;'>📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)</p>
-</div>
-""", unsafe_allow_html=True)
-
-if len(current_messages) == 0:
-    st.info(f"✨ ยินดีต้อนรับฮีโร่ {current_user}! ระบบพร้อมทำงาน ปล่อยใยพิมพ์ข้อความมาได้เลยครับ")
-
-# 4. แสดงข้อความเก่าๆ
-for msg in current_messages:
-    avatar_icon = "🦸‍♂️" if msg["role"] == "user" else "🤖"
-    with st.chat_message(msg["role"], avatar=avatar_icon):
-        if "images" in msg:
-            st.image(msg["images"], width=250)
-        elif "image" in msg:
-            st.image(msg["image"], width=250)
-            
-        st.markdown(msg["content"])
-        if "audio" in msg and msg["audio"] is not None:
-            st.audio(msg["audio"], format="audio/mp3")
-
-# 5. ช่องสำหรับพิมพ์ข้อความ
-if user_input := st.chat_input("ป้อนข้อความที่นี่..."):
-    
-    if uploaded_files:
-        imgs = [Image.open(f) for f in uploaded_files]
-        current_messages.append({"role": "user", "content": user_input, "images": imgs})
-        content_to_send = imgs + [user_input]
-    else:
-        current_messages.append({"role": "user", "content": user_input})
-        content_to_send = [user_input]
-
-    save_chat_to_sheet(current_user, current_topic, "user", user_input)
-
-    with st.chat_message("user", avatar="🦸‍♂️"):
-        if uploaded_files:
-            st.image(imgs, width=250)
-        st.markdown(user_input)
-    
-    with st.chat_message("assistant", avatar="🤖"):
-        response_placeholder = st.empty()
-        sound_placeholder = st.empty()
-        
-        with st.spinner("🕷️ สไปเดอร์เซนส์กำลังทำงาน..."):
-            try: 
-                response = current_instance.send_message(content_to_send)
-                ai_text = response.text
-                response_placeholder.markdown(ai_text)
-                
-                save_chat_to_sheet(current_user, current_topic, "assistant", ai_text)
-                
-                clean_text_for_speech = re.sub(r'[*#`]', '', ai_text)
-                sound_bytes = None
-                try:
-                    sound_file = io.BytesIO()
-                    tts = gTTS(text=clean_text_for_speech, lang='th')
-                    tts.write_to_fp(sound_file)
-                    sound_bytes = sound_file.getvalue()
-                    sound_placeholder.audio(sound_bytes, format="audio/mp3")
-                except Exception:
-                    pass
-                    
-                current_messages.append({
-                    "role": "assistant", 
-                    "content": ai_text,
-                    "audio": sound_bytes
-                })
-                
-            except Exception as e:
-                st.error(f"ระบบขัดข้อง: {e}")
-
-    if uploaded_files:
-        st.session_state.uploader_key += 1
-        st.rerun()
+ai_instruction = f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} (ข้อมูลลับ: ฐานทัพอยู่รามอินทรา กม.8 *ห้ามพูดพิกัดนี้
