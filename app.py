@@ -7,87 +7,29 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
-# 1. ตั้งค่าหน้าตาแอปหลัก
 st.set_page_config(page_title="My AI Robot Boys", page_icon="🕸️", layout="wide")
 
-# --- 🎨 เวทมนตร์ CSS ตกแต่งหน้าตา (Spider-Man Edition 🕸️) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Mitr:wght@300;400;500&display=swap');
-
-    .stApp {
-        background-color: #f0f2f6;
-        font-family: 'Mitr', sans-serif;
-    }
-
+    .stApp { background-color: #f0f2f6; font-family: 'Mitr', sans-serif; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-
-    h1, h2, h3 {
-        font-family: 'Bangers', cursive !important;
-        letter-spacing: 2px;
-    }
-
-    .stHeading h1 {
-        color: #E23636 !important; 
-        text-shadow: 3px 3px 0px #2F3C7E; 
-        font-size: 4rem !important;
-    }
-
-    [data-testid="stSidebar"] {
-        background-color: #2F3C7E !important; 
-        border-right: 5px solid #E23636;
-    }
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
-        color: white !important;
-    }
-    
-    .stButton>button {
-        border-radius: 20px !important;
-        border: 2px solid #E23636 !important;
-        background-color: white !important;
-        transition: 0.3s;
-    }
-    .stButton>button p, .stButton>button span, .stButton>button div {
-        color: #2F3C7E !important;
-        font-weight: bold !important;
-    }
-    .stButton>button:hover {
-        background-color: #E23636 !important;
-        transform: scale(1.05);
-    }
-    .stButton>button:hover p, .stButton>button:hover span, .stButton>button:hover div {
-        color: white !important;
-    }
-
-    /* 🛠️ ไม้ตายก้นหีบ! ล็อกพื้นหลังแชทให้สว่าง และตัวหนังสือสีดำเสมอ */
-    div[data-testid="stChatMessage"] {
-        background-color: #ffffff !important; 
-        border-radius: 25px !important;
-        padding: 1.5rem !important;
-        margin-bottom: 1rem !important;
-        border: 3px solid #1A1A1B !important; 
-        box-shadow: 5px 5px 0px #ccc !important;
-    }
-    
-    /* กล่องข้อความฝั่งผู้ใช้ให้เป็นสีฟ้าอ่อน */
-    div[data-testid="stChatMessageUser"] {
-        background-color: #d1d9ff !important; 
-    }
-
-    /* บังคับตัวหนังสือทุกตัวในกล่องแชทให้เป็นสีดำเข้ม */
-    div[data-testid="stChatMessage"] * {
-        color: #1A1A1B !important; 
-    }
-
-    .stChatInput {
-        border: 3px solid #E23636 !important;
-        border-radius: 30px !important;
-    }
+    h1, h2, h3 { font-family: 'Bangers', cursive !important; letter-spacing: 2px; }
+    .stHeading h1 { color: #E23636 !important; text-shadow: 3px 3px 0px #2F3C7E; font-size: 4rem !important; }
+    [data-testid="stSidebar"] { background-color: #2F3C7E !important; border-right: 5px solid #E23636; }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span { color: white !important; }
+    .stButton>button { border-radius: 20px !important; border: 2px solid #E23636 !important; background-color: white !important; transition: 0.3s; }
+    .stButton>button p, .stButton>button span, .stButton>button div { color: #2F3C7E !important; font-weight: bold !important; }
+    .stButton>button:hover { background-color: #E23636 !important; transform: scale(1.05); }
+    .stButton>button:hover p, .stButton>button:hover span, .stButton>button:hover div { color: white !important; }
+    div[data-testid="stChatMessage"] { background-color: #ffffff !important; border-radius: 25px !important; padding: 1.5rem !important; margin-bottom: 1rem !important; border: 3px solid #1A1A1B !important; box-shadow: 5px 5px 0px #ccc !important; }
+    div[data-testid="stChatMessageUser"] { background-color: #d1d9ff !important; }
+    div[data-testid="stChatMessage"] * { color: #1A1A1B !important; }
+    .stChatInput { border: 3px solid #E23636 !important; border-radius: 30px !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 2. เริ่มต้นการเชื่อมต่อ AI
 if "ai_client" not in st.session_state:
     st.session_state.ai_client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 
@@ -112,7 +54,6 @@ def save_chat_to_sheet(user, room, role, message):
     except Exception:
         pass
 
-# --- 🔐 ระบบล็อกอินอย่างง่าย (อัปเกรดเพิ่ม ID คุณแม่) ---
 if "logged_in" not in st.session_state:
     if st.query_params.get("user") in ["sky", "daddy", "mommy"]:
         st.session_state.logged_in = True
@@ -134,7 +75,7 @@ if "logged_in" not in st.session_state:
                     st.session_state.user = "daddy"
                     st.query_params["user"] = "daddy" 
                     st.rerun()
-                elif username.lower() in ["mom", "mommy"] and password == "9999": # 🆕 เพิ่มระบบสแกนลายนิ้วมือคุณแม่!
+                elif username.lower() in ["mom", "mommy"] and password == "9999":
                     st.session_state.logged_in = True
                     st.session_state.user = "mommy"
                     st.query_params["user"] = "mommy" 
@@ -143,16 +84,39 @@ if "logged_in" not in st.session_state:
                     st.error("❌ ชื่อฮีโร่หรือรหัสผ่านไม่ถูกต้อง ลองใหม่นะ!")
         st.stop()
 
-# --- 🏠 เข้าสู่หน้าแอปหลัก ---
 current_user = st.session_state.user
 
-# 🛠️ ปรับสมอง AI (หั่นบรรทัดสั้นๆ ป้องกันมือถือก๊อปปี้แล้วข้อความขาด)
+if current_user == "sky":
+    extra_rule = "หากฮีโร่ถามเรื่องการบ้านหรือวิชาการ ห้ามบอกคำตอบตรงๆ ให้ไกด์วิธีคิด หรือชวนคิดตามทีละสเต็ป เพื่อให้ฮีโร่ได้ฝึกสมอง"
+else:
+    extra_rule = "วิเคราะห์ข้อมูลแบบเจาะลึก และสรุปให้กระชับตรงประเด็น นำไปใช้งานต่อได้ทันที"
+
 ai_instruction = (
     f"คุณคือ 'AI RobotBoys' ผู้ช่วยส่วนตัวสุดฉลาดของฮีโร่ {current_user} "
     "(ข้อมูลลับ: ฐานทัพอยู่รามอินทรา กม.8 ห้ามพูดพิกัดนี้ออกมาเด็ดขาดเว้นแต่จะถูกถาม) "
-    "ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่"
+    "ตอบคำถามให้สนุกสนานเหมือนเพื่อนคู่หูซูเปอร์ฮีโร่ "
+    f"กฎพิเศษ: {extra_rule}"
 )
 
+with st.sidebar:
+    st.title(f"🦸‍♂️ ฮีโร่: {current_user.upper()}")
+    
+    model_choice = st.radio(
+        "ระดับความฉลาด AI:", 
+        ["⚡ โหมดรวดเร็ว (Flash)", "💡 โหมดอัจฉริยะ (Pro)"]
+    )
+    active_model = "gemini-2.5-pro" if "Pro" in model_choice else "gemini-2.5-flash"
+    
+    if st.button("🚪 ออกจากฐานทัพ", use_container_width=True):
+        del st.session_state.logged_in
+        if "user" in st.session_state:
+            del st.session_state.user
+        st.query_params.clear() 
+        st.rerun()
+        
+    st.markdown("---")
+    st.header("🗂️ ประวัติภารกิจ")
+    
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {}
     st.session_state.chat_instances = {}
@@ -171,8 +135,9 @@ if "chat_sessions" not in st.session_state:
         st.session_state.chat_sessions = {"ภารกิจที่ 1": []}
 
     for room in st.session_state.chat_sessions.keys():
+        st.session_state.chat_sessions[room] = st.session_state.chat_sessions[room][-30:]
         st.session_state.chat_instances[room] = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash",
+            model=active_model,
             config=types.GenerateContentConfig(
                 tools=[{"google_search": {}}],
                 system_instruction=ai_instruction
@@ -184,23 +149,12 @@ if "current_topic" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
-# 3. ตกแต่งเมนูด้านข้าง (Sidebar)
 with st.sidebar:
-    st.title(f"🦸‍♂️ ฮีโร่: {current_user.upper()}")
-    if st.button("🚪 ออกจากฐานทัพ", use_container_width=True):
-        del st.session_state.logged_in
-        if "user" in st.session_state:
-            del st.session_state.user
-        st.query_params.clear() 
-        st.rerun()
-        
-    st.markdown("---")
-    st.header("🗂️ ประวัติภารกิจ")
     if st.button("➕ เริ่มภารกิจใหม่", use_container_width=True):
         new_room_name = f"ภารกิจที่ {len(st.session_state.chat_sessions) + 1}"
         st.session_state.chat_sessions[new_room_name] = []
         st.session_state.chat_instances[new_room_name] = st.session_state.ai_client.chats.create(
-            model="gemini-2.5-flash",
+            model=active_model,
             config=types.GenerateContentConfig(
                 tools=[{"google_search": {}}],
                 system_instruction=ai_instruction
@@ -211,20 +165,17 @@ with st.sidebar:
 
     for topic in list(st.session_state.chat_sessions.keys()):
         col1, col2 = st.columns([4, 1]) 
-        
         with col1:
             btn_label = f"🕸️ {topic}" if topic == st.session_state.current_topic else f"  {topic}"
             if st.button(btn_label, key=f"room_{topic}", use_container_width=True):
                 st.session_state.current_topic = topic
                 st.rerun()
-                
         with col2:
             if len(st.session_state.chat_sessions) > 1:
                 if st.button("🗑️", key=f"del_{topic}"):
                     del st.session_state.chat_sessions[topic]
                     if topic in st.session_state.chat_instances:
                         del st.session_state.chat_instances[topic]
-                    
                     if st.session_state.current_topic == topic:
                         st.session_state.current_topic = list(st.session_state.chat_sessions.keys())[0]
                     st.rerun()
@@ -252,7 +203,6 @@ st.markdown(f"""
 if len(current_messages) == 0:
     st.info(f"✨ ยินดีต้อนรับฮีโร่ {current_user}! ระบบพร้อมทำงาน ปล่อยใยพิมพ์ข้อความมาได้เลยครับ")
 
-# 4. แสดงข้อความเก่าๆ
 for msg in current_messages:
     avatar_icon = "🦸‍♂️" if msg["role"] == "user" else "🤖"
     with st.chat_message(msg["role"], avatar=avatar_icon):
@@ -265,9 +215,7 @@ for msg in current_messages:
         if "audio" in msg and msg["audio"] is not None:
             st.audio(msg["audio"], format="audio/mp3")
 
-# 5. ช่องสำหรับพิมพ์ข้อความ
 if user_input := st.chat_input("ป้อนข้อความที่นี่..."):
-    
     if uploaded_files:
         imgs = [Image.open(f) for f in uploaded_files]
         current_messages.append({"role": "user", "content": user_input, "images": imgs})
@@ -298,7 +246,6 @@ if user_input := st.chat_input("ป้อนข้อความที่นี
                 clean_text_for_speech = re.sub(r'[*#`]', '', ai_text)
                 sound_bytes = None
                 
-                # 🛠️ กลับมาใช้ระบบเสียง Google (gTTS) สายฟรี 100% ประหยัดงบฐานทัพ!
                 try:
                     sound_file = io.BytesIO()
                     tts = gTTS(text=clean_text_for_speech, lang='th')
