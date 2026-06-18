@@ -12,21 +12,61 @@ st.set_page_config(page_title="My AI Robot Boys", page_icon="🕸️", layout="w
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Mitr:wght@300;400;500&display=swap');
+    
     .stApp { background-color: #f0f2f6; font-family: 'Mitr', sans-serif; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    
     h1, h2, h3 { font-family: 'Bangers', cursive !important; letter-spacing: 2px; }
-    .stHeading h1 { color: #E23636 !important; text-shadow: 3px 3px 0px #2F3C7E; font-size: 4rem !important; }
+    
+    .stHeading h1 { 
+        color: #E23636 !important; 
+        text-shadow: 3px 3px 0px #2F3C7E; 
+        font-size: clamp(2.5rem, 8vw, 4rem) !important; 
+        line-height: 1.2;
+        text-align: center;
+    }
+    
     [data-testid="stSidebar"] { background-color: #2F3C7E !important; border-right: 5px solid #E23636; }
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span { color: white !important; }
+    
     .stButton>button { border-radius: 20px !important; border: 2px solid #E23636 !important; background-color: white !important; transition: 0.3s; }
     .stButton>button p, .stButton>button span, .stButton>button div { color: #2F3C7E !important; font-weight: bold !important; }
     .stButton>button:hover { background-color: #E23636 !important; transform: scale(1.05); }
     .stButton>button:hover p, .stButton>button:hover span, .stButton>button:hover div { color: white !important; }
-    div[data-testid="stChatMessage"] { background-color: #ffffff !important; border-radius: 25px !important; padding: 1.5rem !important; margin-bottom: 1rem !important; border: 3px solid #1A1A1B !important; box-shadow: 5px 5px 0px #ccc !important; }
+    
+    div[data-testid="stChatMessage"] { 
+        background-color: #ffffff !important; 
+        border-radius: 15px !important; 
+        padding: 1rem !important; 
+        margin-bottom: 1rem !important; 
+        border: 2px solid #1A1A1B !important; 
+        box-shadow: 3px 3px 0px #ccc !important; 
+    }
     div[data-testid="stChatMessageUser"] { background-color: #d1d9ff !important; }
     div[data-testid="stChatMessage"] * { color: #1A1A1B !important; }
-    .stChatInput { border: 3px solid #E23636 !important; border-radius: 30px !important; }
+    
+    [data-testid="stChatInput"] { 
+        background-color: #ffffff !important;
+        border-radius: 30px !important;
+        padding: 5px !important;
+    }
+    .stChatInput { 
+        border: 3px solid #E23636 !important; 
+        border-radius: 30px !important; 
+        background-color: white !important;
+    }
+    textarea[aria-label="ป้อนข้อความที่นี่..."] {
+        color: #1A1A1B !important;
+        background-color: white !important;
+    }
+
+    [data-testid="stPopoverBody"] {
+        border-radius: 20px !important;
+        border: 2px solid #E23636 !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        background-color: white !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -180,14 +220,6 @@ with st.sidebar:
                         st.session_state.current_topic = list(st.session_state.chat_sessions.keys())[0]
                     st.rerun()
             
-    st.markdown("---")
-    st.header("📸 วิเคราะห์รูปภาพ")
-    uploaded_files = st.file_uploader(
-        "อัปโหลดรูปเบาะแส", type=["jpg", "jpeg", "png"], 
-        key=f"uploader_{st.session_state.uploader_key}",
-        label_visibility="collapsed", accept_multiple_files=True 
-    )
-
 current_topic = st.session_state.current_topic
 current_messages = st.session_state.chat_sessions[current_topic]
 current_instance = st.session_state.chat_instances[current_topic]
@@ -196,7 +228,7 @@ st.title("🕸️ My AI Robot Boys 🕷️")
 
 st.markdown(f"""
 <div style='background-color: white; padding: 10px; border-radius: 10px; border: 2px solid #E23636; margin-bottom: 15px;'>
-    <p style='color: #1A1A1B; font-size: 16px; font-weight: bold; margin: 0;'>📍 ฐานทัพ: {current_topic} (บันทึกข้อมูลลงระบบคลาวด์แล้ว 📊)</p>
+    <p style='color: #1A1A1B; font-size: 14px; font-weight: bold; margin: 0; text-align: center;'>📍 ฐานทัพ: {current_topic} (บันทึกคลาวด์แล้ว 📊)</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -215,7 +247,26 @@ for msg in current_messages:
         if "audio" in msg and msg["audio"] is not None:
             st.audio(msg["audio"], format="audio/mp3")
 
-if user_input := st.chat_input("ป้อนข้อความที่นี่..."):
+col1, col2 = st.columns([1, 6])
+with col1:
+    with st.popover("📷 เครื่องมือ"):
+        st.markdown("#### เครื่องมือฮีโร่")
+        uploaded_files = st.file_uploader(
+            "อัปโหลดรูปเบาะแส", type=["jpg", "jpeg", "png"], 
+            key=f"uploader_{st.session_state.uploader_key}",
+            accept_multiple_files=True 
+        )
+        st.markdown("---")
+        st.markdown("#### จำลองเครื่องมืออื่น (ตามภาพ)")
+        st.markdown("- 📸 กล้อง (เร็วๆ นี้)")
+        st.markdown("- 🎨 สร้างรูปภาพ (เร็วๆ นี้)")
+        st.markdown("- 🎬 ต่อขยายวิดีโอ (เร็วๆ นี้)")
+        st.markdown("- 🎵 สร้างเสียง (เร็วๆ นี้)")
+
+with col2:
+    user_input = st.chat_input("ป้อนข้อความที่นี่...")
+
+if user_input:
     if uploaded_files:
         imgs = [Image.open(f) for f in uploaded_files]
         current_messages.append({"role": "user", "content": user_input, "images": imgs})
